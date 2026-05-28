@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enrollify — Demo</title>
+<meta name="description" content="A 2-minute look at how Enrollify works.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%233d5a3a'/><text x='50%25' y='52%25' dominant-baseline='middle' text-anchor='middle' font-family='Georgia, serif' font-style='italic' font-size='22' font-weight='400' fill='%23fbf8f3'>E</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fbf8f3;
+    --bg-2: #f3ede1;
+    --bg-3: #ede6d6;
+    --ink: #1a1915;
+    --ink-2: #54504a;
+    --ink-3: #8a8378;
+    --accent: #3d5a3a;
+    --accent-dark: #2d4229;
+    --accent-3: #f4d47c;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Geist', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .top-bar {
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 18px;
+  }
+  .logo-mark {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--bg);
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-style: italic;
+    font-size: 22px;
+  }
+
+  main {
+    flex: 1;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 24px 24px 60px;
+    width: 100%;
+  }
+  .heading {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: 48px;
+    line-height: 1.05;
+    font-weight: 400;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+  .heading em {
+    color: var(--accent);
+  }
+  .sub {
+    color: var(--ink-2);
+    font-size: 17px;
+    margin-bottom: 32px;
+    max-width: 640px;
+  }
+
+  /* Browser-chrome video player wrapper */
+  .demo-frame {
+    background: var(--bg-2);
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 8px 32px rgba(26,25,21,0.08);
+    margin-bottom: 32px;
+  }
+  .browser-chrome {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 6px 14px;
+  }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot.r { background: #d88b7a; }
+  .dot.y { background: #f4d47c; }
+  .dot.g { background: #3d5a3a; }
+  .url-bar {
+    flex: 1;
+    margin-left: 10px;
+    background: var(--bg);
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 12px;
+    color: var(--ink-3);
+    text-align: center;
+  }
+
+  .video-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    background: #000;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .demo-tabs {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 86px;
+    background: rgba(251,248,243,0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 2;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .demo-tabs-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--ink-3);
+    text-transform: uppercase;
+  }
+  .demo-tabs-row {
+    display: flex;
+    gap: 8px;
+  }
+  .demo-tab {
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink-2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.18s;
+  }
+  .demo-tab:hover {
+    background: var(--bg-3);
+    color: var(--ink);
+  }
+  .demo-tab.active {
+    background: var(--ink);
+    color: var(--bg);
+  }
+  .demo-tab-num {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--bg-3);
+    color: var(--ink-2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .demo-tab.active .demo-tab-num {
+    background: var(--accent);
+    color: var(--bg);
+  }
+  .demo-tab:not(.active) .demo-tab-num {
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(61,90,58,0.4); }
+    50%      { box-shadow: 0 0 0 6px rgba(61,90,58,0); }
+  }
+
+  #demoVideo {
+    position: absolute;
+    top: 86px; left: 0;
+    width: 100%;
+    height: calc(100% - 86px);
+    object-fit: contain;
+    background: #000;
+  }
+
+  .cta-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .cta {
+    display: inline-block;
+    background: var(--ink);
+    color: var(--bg);
+    padding: 14px 28px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 16px;
+    transition: background 0.15s;
+  }
+  .cta:hover { background: var(--accent-dark); background: var(--accent); }
+  .reply-hint {
+    color: var(--ink-3);
+    font-size: 14px;
+    text-align: center;
+    max-width: 520px;
+  }
+
+  footer {
+    padding: 24px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+  footer a { color: var(--ink-2); text-decoration: none; }
+  footer a:hover { color: var(--accent); }
+
+  @media (max-width: 600px) {
+    .heading { font-size: 34px; }
+    .sub { font-size: 15px; margin-bottom: 24px; }
+    .demo-frame { padding: 12px; }
+    main { padding: 16px 16px 40px; }
+    .demo-tabs { height: 56px; padding: 8px 10px; gap: 4px; }
+    .demo-tabs-label { display: none; }
+    .demo-tabs-row { gap: 6px; }
+    .demo-tab { padding: 6px 10px; font-size: 12px; gap: 6px; flex: 1; justify-content: center; white-space: nowrap; }
+    .demo-tab-num { width: 16px; height: 16px; font-size: 10px; }
+    #demoVideo { top: 56px; height: calc(100% - 56px); }
+    .url-bar { font-size: 10px; padding: 4px 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a href="/" class="logo">
+    <span class="logo-mark">E</span>
+    Enrollify
+  </a>
+</div>
+
+<main>
+  <h1 class="heading">A 2-minute look at <em>how it works</em>.</h1>
+  <p class="sub">Two views of the same product. See how parents experience your admissions page, and how your admin team manages every application from one place.</p>
+
+  <div class="demo-frame">
+    <div class="browser-chrome">
+      <span class="dot r"></span>
+      <span class="dot y"></span>
+      <span class="dot g"></span>
+      <span class="url-bar">app.enrollifyapp.com</span>
+    </div>
+    <div class="video-wrap">
+      <div class="demo-tabs">
+        <span class="demo-tabs-label">2 videos</span>
+        <div class="demo-tabs-row">
+          <button class="demo-tab" data-video="parent-demo.mp4">
+            <span class="demo-tab-num">1</span> Parent Experience
+          </button>
+          <button class="demo-tab active" data-video="admin-demo.mov">
+            <span class="demo-tab-num">2</span> Admin Workflow
+          </button>
+        </div>
+      </div>
+      <video id="demoVideo" src="admin-demo.mov" controls preload="metadata"></video>
+    </div>
+  </div>
+
+  <div class="cta-row">
+    <a href="/#contact" class="cta">Get started →</a>
+    <p class="reply-hint">Or just reply to my email — I'll get back to you the same day.</p>
+  </div>
+</main>
+
+<footer>
+  <a href="/">← Back to enrollifyapp.com</a>
+</footer>
+
+<script>
+  const tabs = document.querySelectorAll('.demo-tab');
+  const video = document.getElementById('demoVideo');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      video.src = tab.dataset.video;
+      video.play().catch(() => {});
+    });
+  });
+</script>
+
+</body>
+</html>
