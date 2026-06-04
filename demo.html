@@ -297,6 +297,7 @@
 </footer>
 
 <script>
+  // ─── Video tab switching ─────────────────────────────────
   const tabs = document.querySelectorAll('.demo-tab');
   const video = document.getElementById('demoVideo');
   tabs.forEach(tab => {
@@ -307,6 +308,92 @@
       video.play().catch(() => {});
     });
   });
+</script>
+
+<script>
+  // ─── Click tracking (human-gesture filtered) ─────────────
+  // Logs a visit only if a real user gesture (mouse, scroll, key, touch)
+  // is detected within HUMAN_TIMEOUT_MS. Email security scanners typically
+  // load the page but never generate input events, so they're filtered out.
+  //
+  // sessionStorage prevents double-logging on refresh within one browser session.
+  // Scanners spawn fresh contexts so they'd still fire — the gesture filter
+  // is what actually saves us.
+  (function() {
+    // ====== PASTE YOUR APPS SCRIPT WEB APP URL HERE ======
+    // It looks like: https://script.google.com/macros/s/AKfycb.../exec
+    const LOGGER_URL = 'https://script.google.com/macros/s/AKfycbxC_jG6QI9cuXYNRWfq1nn0fJlUTCkeAJmx_x4k24QlN6-if-pTjq5UrOsxaHCHy7td/exec';
+    // =====================================================
+
+    const HUMAN_TIMEOUT_MS = 8000;
+    const STORAGE_KEY = 'enrollify_logged_v1';
+
+    // Parse query string
+    const params = new URLSearchParams(window.location.search);
+    const lead_id = params.get('utm_content') || params.get('lead') || '';
+    const utm_source = params.get('utm_source') || '';
+    const utm_campaign = params.get('utm_campaign') || '';
+
+    // No lead_id = no tracking. (Organic /demo visits aren't logged.)
+    if (!lead_id) return;
+
+    // Skip if logger URL not configured
+    if (!LOGGER_URL || LOGGER_URL.indexOf('PASTE') !== -1) {
+      console.warn('[enrollify] click logger URL not configured');
+      return;
+    }
+
+    // Skip if we've already logged in this session
+    try {
+      if (sessionStorage.getItem(STORAGE_KEY) === lead_id) return;
+    } catch (e) { /* sessionStorage blocked, continue */ }
+
+    let logged = false;
+    function send(gestureType) {
+      if (logged) return;
+      logged = true;
+
+      try { sessionStorage.setItem(STORAGE_KEY, lead_id); } catch (e) { /* ignore */ }
+
+      const payload = {
+        lead_id: lead_id,
+        utm_content: lead_id,
+        utm_source: utm_source,
+        utm_campaign: utm_campaign,
+        user_agent: navigator.userAgent || '',
+        referer: document.referrer || '',
+        path: window.location.pathname,
+        gesture_type: gestureType,
+      };
+
+      // Fire and forget. mode: 'no-cors' avoids preflight; Apps Script
+      // accepts the POST anyway because we read body as text on the server.
+      try {
+        fetch(LOGGER_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {'Content-Type': 'text/plain;charset=utf-8'},
+          body: JSON.stringify(payload),
+          keepalive: true,
+        }).catch(() => {});
+      } catch (e) { /* ignore */ }
+    }
+
+    // Listen for the first real user gesture
+    const events = ['mousemove', 'scroll', 'keydown', 'touchstart', 'click'];
+    function onGesture(e) {
+      send(e.type);
+      events.forEach(ev => window.removeEventListener(ev, onGesture, {passive: true, capture: true}));
+    }
+    events.forEach(ev => {
+      window.addEventListener(ev, onGesture, {passive: true, capture: true, once: false});
+    });
+
+    // Safety net: if no gesture fires within timeout, skip — that's a scanner.
+    setTimeout(() => {
+      events.forEach(ev => window.removeEventListener(ev, onGesture, {passive: true, capture: true}));
+    }, HUMAN_TIMEOUT_MS);
+  })();
 </script>
 
 </body>
